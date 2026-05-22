@@ -6,7 +6,7 @@ Prevent API keys, passwords, and secrets from being committed to git.
 
 ```bash
 # Run setup wizard in any git repo
-npx sensitive-guard
+npx sensitive-guard-cli
 ```
 
 The wizard will:
