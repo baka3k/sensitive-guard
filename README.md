@@ -50,7 +50,7 @@ Add project-specific terms to `.sensitive-terms` at your repo root:
 ```
 # .sensitive-terms
 my-internal-project
-hieplq1
+baka3k
 internal-hostname.corp
 ```
 
