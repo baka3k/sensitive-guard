@@ -18,11 +18,11 @@ The wizard will:
 
 | Command | Description |
 |---|---|
-| `npx sensitive-guard` | Interactive setup wizard |
-| `npx sensitive-guard add <term>` | Add a custom sensitive term |
-| `npx sensitive-guard list` | Show all rules and custom terms |
-| `npx sensitive-guard status` | Check if hook is installed |
-| `npx sensitive-guard remove` | Uninstall the hook |
+| `npx sensitive-guard-cli` | Interactive setup wizard |
+| `npx sensitive-guard-cli add <term>` | Add a custom sensitive term |
+| `npx sensitive-guard-cli list` | Show all rules and custom terms |
+| `npx sensitive-guard-cli status` | Check if hook is installed |
+| `npx sensitive-guard-cli remove` | Uninstall the hook |
 
 ## What it blocks
 
