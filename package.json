@@ -1,0 +1,29 @@
+{
+  "name": "sensitive-guard",
+  "version": "1.0.0",
+  "description": "Prevent API keys, passwords, and secrets from being committed to git",
+  "bin": {
+    "sensitive-guard": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "keywords": [
+    "git",
+    "security",
+    "secrets",
+    "pre-commit",
+    "hook",
+    "api-key",
+    "password"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/sensitive-guard"
+  }
+}
