@@ -1,6 +1,6 @@
 {
   "name": "sensitive-guard-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Prevent API keys, passwords, and secrets from being committed to git",
   "bin": {
     "sensitive-guard-cli": "./bin/cli.js"
