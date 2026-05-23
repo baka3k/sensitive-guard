@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Prevent API keys, passwords, and secrets from being committed to git",
   "bin": {
-    "sensitive-guard": "./bin/cli.js"
+    "sensitive-guard-cli": "./bin/cli.js"
   },
   "files": [
     "bin/",

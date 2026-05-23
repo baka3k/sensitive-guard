@@ -51,7 +51,7 @@ function isHookInstalled(gitRoot) {
 
 function printHeader() {
   const v = `v${PKG.version}`;
-  const title = `  sensitive-guard ${v}  `;
+  const title = `  sensitive-guard-cli ${v}  `;
   const border = '='.repeat(title.length);
   console.log('');
   console.log(bold(cyan(`  ${border}`)));
@@ -109,7 +109,7 @@ function appendTerms(gitRoot, newTerms) {
   if (!toAdd.length) return 0;
 
   const header = fs.existsSync(p) ? '' : [
-    '# .sensitive-terms — managed by sensitive-guard',
+    '# .sensitive-terms — managed by sensitive-guard-cli',
     '# Each line is a term blocked at commit time (case-insensitive, fixed string).',
     '# Lines starting with # are comments. Blank lines are ignored.',
     '#',
@@ -139,7 +139,7 @@ function installHook(gitRoot) {
 
   if (fs.existsSync(hookPath)) {
     const content = fs.readFileSync(hookPath, 'utf8');
-    if (!content.includes('sensitive-guard')) {
+    if (!content.includes('sensitive-guard-cli')) {
       const backup = `${hookPath}.bak.${Date.now()}`;
       fs.copyFileSync(hookPath, backup);
       console.log(`  ${yellow('!')} Existing hook backed up to ${dim(path.basename(backup))}`);
@@ -166,13 +166,13 @@ async function cmdInit() {
 
   // Already installed?
   if (isHookInstalled(gitRoot)) {
-    console.log(`  ${yellow('!')} sensitive-guard hook is already installed.`);
+    console.log(`  ${yellow('!')} sensitive-guard-cli hook is already installed.`);
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     const ans = await ask(rl, `  ${bold('Reinstall / reconfigure? (y/N)')} `);
     rl.close();
     console.log('');
     if (ans.toLowerCase() !== 'y') {
-      console.log(dim('  Aborted. Run `sensitive-guard list` to see active config.'));
+      console.log(dim('  Aborted. Run `sensitive-guard-cli list` to see active config.'));
       console.log('');
       return;
     }
@@ -214,14 +214,14 @@ async function cmdInit() {
   ensureGitignore(gitRoot);
 
   console.log('');
-  console.log(bold(green('  sensitive-guard is now active!')));
+  console.log(bold(green('  sensitive-guard-cli is now active!')));
   console.log('');
   console.log(`  ${bold('What happens next:')}`);
   console.log(`  • Every ${yellow('git commit')} will be scanned automatically`);
   console.log(`  • Edit ${yellow('.sensitive-terms')} to add/remove custom terms`);
-  console.log(`  • Run  ${yellow('npx sensitive-guard list')}   to review all rules`);
-  console.log(`  • Run  ${yellow('npx sensitive-guard add <term>')} to add a term`);
-  console.log(`  • Run  ${yellow('npx sensitive-guard remove')}  to uninstall`);
+  console.log(`  • Run  ${yellow('npx sensitive-guard-cli list')}   to review all rules`);
+  console.log(`  • Run  ${yellow('npx sensitive-guard-cli add <term>')} to add a term`);
+  console.log(`  • Run  ${yellow('npx sensitive-guard-cli remove')}  to uninstall`);
   console.log(`  • ${dim('Emergency bypass:')} ${yellow('git commit --no-verify')}`);
   console.log('');
 }
@@ -248,7 +248,7 @@ function cmdList() {
       console.log(dim(`  Edit ${path.join(gitRoot, '.sensitive-terms')} to change these.`));
     } else {
       console.log(dim('  No custom terms configured.'));
-      console.log(dim('  Run `sensitive-guard add <term>` or re-run `sensitive-guard init`.'));
+      console.log(dim('  Run `sensitive-guard-cli add <term>` or re-run `sensitive-guard-cli init`.'));
     }
     console.log('');
   }
@@ -256,7 +256,7 @@ function cmdList() {
 
 function cmdAdd(term) {
   if (!term) {
-    console.log(red('  Usage: sensitive-guard add <term>'));
+    console.log(red('  Usage: sensitive-guard-cli add <term>'));
     process.exit(1);
   }
   const gitRoot = findGitRoot();
@@ -286,7 +286,7 @@ function cmdStatus() {
   console.log('');
 
   if (!installed) {
-    console.log(dim('  Run `npx sensitive-guard init` to install.'));
+    console.log(dim('  Run `npx sensitive-guard-cli init` to install.'));
     console.log('');
   }
 }
@@ -307,7 +307,7 @@ function cmdRemove() {
 
 function cmdHelp() {
   printHeader();
-  console.log(`  ${bold('Usage:')} sensitive-guard [command]`);
+  console.log(`  ${bold('Usage:')} sensitive-guard-cli [command]`);
   console.log('');
   console.log(`  ${bold('Commands:')}`);
   console.log(`    ${yellow('init')}           Interactive setup wizard (default)`);
@@ -318,10 +318,10 @@ function cmdHelp() {
   console.log(`    ${yellow('help')}           Show this help`);
   console.log('');
   console.log(`  ${bold('Examples:')}`);
-  console.log(`    npx sensitive-guard`);
-  console.log(`    npx sensitive-guard add my-project-name`);
-  console.log(`    npx sensitive-guard add hieplq1`);
-  console.log(`    npx sensitive-guard list`);
+  console.log(`    npx sensitive-guard-cli init`);
+  console.log(`    npx sensitive-guard-cli add my-project-name`);
+  console.log(`    npx sensitive-guard-cli add baka3k`);
+  console.log(`    npx sensitive-guard-cli list`);
   console.log('');
 }
 
