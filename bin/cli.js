@@ -110,7 +110,10 @@ function appendTerms(gitRoot, newTerms) {
 
   const header = fs.existsSync(p) ? '' : [
     '# .sensitive-terms — managed by sensitive-guard-cli',
-    '# Each line is a term blocked at commit time (case-insensitive, fixed string).',
+    '# Each line is a term blocked at commit time.',
+    '# Plain terms match whole words, case-insensitively: baka3k',
+    '# Prefix with case: for case-sensitive matching: case:BAKA3K',
+    '# Use * as a wildcard: baka3k*, *baka3k, or *baka3k*',
     '# Lines starting with # are comments. Blank lines are ignored.',
     '#',
     '# Add project-specific terms below:',

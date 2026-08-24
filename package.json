@@ -5,6 +5,9 @@
   "bin": {
     "sensitive-guard-cli": "./bin/cli.js"
   },
+  "scripts": {
+    "test": "bash tests/hook.test.sh"
+  },
   "files": [
     "bin/",
     "lib/"

@@ -54,7 +54,36 @@ baka3k
 internal-hostname.corp
 ```
 
+Plain terms match whole words and are case-insensitive. For example, `baka3k`
+blocks `baka3k` and `BAKA3K`, but does not block `mybaka3kvalue`.
+
+Custom terms support the following search options:
+
+| Syntax | Matching behavior | Example match | Example not matched |
+|---|---|---|---|
+| `baka3k` | Whole word, case-insensitive | `BAKA3K` | `mybaka3kvalue` |
+| `case:BAKA3K` | Whole word, case-sensitive | `BAKA3K` | `baka3k` |
+| `baka3k*` | Starts with, case-insensitive | `baka3k_client` | `mybaka3k` |
+| `*baka3k` | Ends with, case-insensitive | `mybaka3k` | `baka3k_client` |
+| `*baka3k*` | Contains, case-insensitive | `mybaka3kvalue` | — |
+| `case:BAKA3K*` | Wildcard, case-sensitive | `BAKA3K_client` | `baka3k_client` |
+
+Only `*` has wildcard behavior. Other regex characters such as `.`, `+`, `[`
+and `(` are matched literally.
+
+You can use the same syntax with the CLI. Quote wildcard terms so that your
+shell does not expand `*` before the command runs:
+
+```bash
+npx sensitive-guard-cli add baka3k
+npx sensitive-guard-cli add "case:BAKA3K"
+npx sensitive-guard-cli add "baka3k*"
+```
+
 This file is automatically added to `.gitignore` — it will never be committed.
+
+If the hook was installed by an older version, run `npx sensitive-guard-cli init`
+and confirm reinstallation so `.git/hooks/pre-commit` receives the new matcher.
 
 ## Bypass
 

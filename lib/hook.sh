@@ -35,6 +35,21 @@ _check() {
 check_exact() { _check "-E"  "$1" "$2" "$3"; }
 check_icase() { _check "-iE" "$1" "$2" "$3"; }
 
+_custom_term_pattern() {
+  local term="$1"
+  local pattern
+
+  # Treat every regex metacharacter as text. Only '*' is a wildcard.
+  pattern=$(printf '%s' "$term" \
+    | sed -e 's/[][\\.^$()+?{|}]/\\&/g' -e 's/\*/.*/g')
+
+  # Without a wildcard at an edge, require a whole-word boundary there.
+  [[ "$term" == \** ]] || pattern="(^|[^[:alnum:]_])${pattern}"
+  [[ "$term" == *\* ]] || pattern="${pattern}([^[:alnum:]_]|$)"
+
+  printf '%s' "$pattern"
+}
+
 # ── built-in patterns ────────────────────────────────────────────────────────
 
 for file in $STAGED_FILES; do
@@ -64,13 +79,36 @@ done
 
 if [ -f "$SENSITIVE_TERMS_FILE" ]; then
   while IFS= read -r term || [ -n "$term" ]; do
+    term="${term%$'\r'}"
     [[ -z "$term" || "$term" == \#* ]] && continue
+
+    case_sensitive=0
+    if [[ "$term" == case:* ]]; then
+      case_sensitive=1
+      term="${term#case:}"
+    fi
+
+    if [ -z "$term" ]; then
+      echo -e "${YELLOW}[WARN] Ignoring empty custom term after 'case:' prefix.${NC}"
+      continue
+    fi
+
+    pattern=$(_custom_term_pattern "$term")
+
     for file in $STAGED_FILES; do
-      matches=$(git diff --cached -U0 "$file" 2>/dev/null \
-        | grep "^+" | grep -v "^+++" \
-        | grep -iF "$term" 2>/dev/null)
+      if [ "$case_sensitive" -eq 1 ]; then
+        matches=$(git diff --cached -U0 "$file" 2>/dev/null \
+          | grep "^+" | grep -v "^+++" \
+          | grep -E "$pattern" 2>/dev/null)
+        match_mode="whole-word/wildcard, case-sensitive"
+      else
+        matches=$(git diff --cached -U0 "$file" 2>/dev/null \
+          | grep "^+" | grep -v "^+++" \
+          | grep -iE "$pattern" 2>/dev/null)
+        match_mode="whole-word/wildcard, case-insensitive"
+      fi
       [ -z "$matches" ] && continue
-      echo -e "${RED}[BLOCKED] Custom term '${YELLOW}${term}${RED}' in: ${YELLOW}${file}${NC}"
+      echo -e "${RED}[BLOCKED] Custom term '${YELLOW}${term}${RED}' (${match_mode}) in: ${YELLOW}${file}${NC}"
       echo "$matches" | head -3 | sed 's/^/  /'
       echo ""
       FOUND=1
