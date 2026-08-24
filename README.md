@@ -85,7 +85,42 @@ This file is automatically added to `.gitignore` — it will never be committed.
 If the hook was installed by an older version, run `npx sensitive-guard-cli init`
 and confirm reinstallation so `.git/hooks/pre-commit` receives the new matcher.
 
-## Bypass
+## Allow known-safe values
+
+For an intentionally safe local, test, or sample value, add
+`sensitive-guard:allow` on the same line:
+
+`.env` or properties files:
+
+```dotenv
+password=local_test_password # sensitive-guard:allow -- local test database
+```
+
+JavaScript or TypeScript:
+
+```javascript
+const password = "test_password"; // sensitive-guard:allow -- sample config
+```
+
+YAML:
+
+```yaml
+password: test_password # sensitive-guard:allow -- test environment
+```
+
+Declaration rules:
+
+- Write the marker exactly as `sensitive-guard:allow`; it is case-sensitive.
+- Put the marker on the same line as the known-safe value.
+- Follow the marker with whitespace or the end of the line.
+- Text after the marker is optional and can document why the exception is safe.
+- Similar text such as `sensitive-guard:allowed` does not bypass detection.
+
+The annotation bypasses every sensitive-guard rule for that line only. Keep it
+limited to non-production values so the exception remains visible and
+reviewable in Git. Other lines in the same file are still scanned normally.
+
+## Bypass an entire commit
 
 For cases where the detection fires incorrectly:
 

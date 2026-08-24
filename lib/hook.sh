@@ -10,6 +10,7 @@ NC='\033[0m'
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 SENSITIVE_TERMS_FILE="$REPO_ROOT/.sensitive-terms"
+ALLOW_MARKER_PATTERN='sensitive-guard:allow([[:space:]]|$)'
 FOUND=0
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=d)
@@ -19,11 +20,18 @@ echo ""
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
+_added_lines() {
+  local file="$1"
+
+  git diff --cached -U0 "$file" 2>/dev/null \
+    | grep "^+" | grep -v "^+++" \
+    | grep -Ev "$ALLOW_MARKER_PATTERN"
+}
+
 _check() {
   local flag="$1" label="$2" pattern="$3" file="$4"
   local matches
-  matches=$(git diff --cached -U0 "$file" 2>/dev/null \
-    | grep "^+" | grep -v "^+++" \
+  matches=$(_added_lines "$file" \
     | grep "$flag" "$pattern" 2>/dev/null)
   [ -z "$matches" ] && return
   echo -e "${RED}[BLOCKED] ${label} in: ${YELLOW}${file}${NC}"
@@ -97,13 +105,11 @@ if [ -f "$SENSITIVE_TERMS_FILE" ]; then
 
     for file in $STAGED_FILES; do
       if [ "$case_sensitive" -eq 1 ]; then
-        matches=$(git diff --cached -U0 "$file" 2>/dev/null \
-          | grep "^+" | grep -v "^+++" \
+        matches=$(_added_lines "$file" \
           | grep -E "$pattern" 2>/dev/null)
         match_mode="whole-word/wildcard, case-sensitive"
       else
-        matches=$(git diff --cached -U0 "$file" 2>/dev/null \
-          | grep "^+" | grep -v "^+++" \
+        matches=$(_added_lines "$file" \
           | grep -iE "$pattern" 2>/dev/null)
         match_mode="whole-word/wildcard, case-insensitive"
       fi
@@ -122,6 +128,7 @@ if [ "$FOUND" -eq 1 ]; then
   echo -e "${RED}Commit blocked: sensitive information detected.${NC}"
   echo -e "  Edit ${YELLOW}.sensitive-terms${NC} to manage custom blocked terms."
   echo -e "  Run  ${YELLOW}npx sensitive-guard-cli list${NC} to see all active rules."
+  echo -e "  Add  ${YELLOW}sensitive-guard:allow${NC} on the same line only for known-safe test/sample values."
   echo -e "  Use  ${YELLOW}git commit --no-verify${NC} to bypass (use with care)."
   echo ""
   exit 1

@@ -55,6 +55,22 @@ run_case "wildcard-case-sensitive-block" "case:BAKA3K*" "BAKA3K_client" 1
 run_case "regex-character-literal-pass" "baka3k.dev" "baka3kXdev" 0
 run_case "regex-character-literal-block" "baka3k.dev" "baka3k.dev" 1
 run_case "comments-ignored" $'#baka3k\n\nother-term' "baka3k" 0
+run_case "built-in-without-allow-marker" "unrelated-term" \
+  'password=local_test_password' 1
+run_case "built-in-inline-allow" "unrelated-term" \
+  'password=local_test_password # sensitive-guard:allow -- local test database' 0
+run_case "custom-term-inline-allow" "baka3k" \
+  'baka3k # sensitive-guard:allow -- public sample value' 0
+run_case "allow-marker-without-reason" "unrelated-term" \
+  'password=local_test_password # sensitive-guard:allow' 0
+run_case "allow-marker-only-applies-to-same-line" "unrelated-term" \
+  $'# sensitive-guard:allow -- next line is not allowed\npassword=production_password' 1
+run_case "one-allowed-line-does-not-hide-another" "unrelated-term" \
+  $'password=local_test_password # sensitive-guard:allow\npassword=production_password' 1
+run_case "near-allow-marker-does-not-bypass" "unrelated-term" \
+  'password=local_test_password # sensitive-guard:allowed' 1
+run_case "allow-marker-is-case-sensitive" "unrelated-term" \
+  'password=local_test_password # SENSITIVE-GUARD:ALLOW' 1
 
 printf '\n%s passed, %s failed\n' "$PASSED" "$FAILED"
 [ "$FAILED" -eq 0 ]
